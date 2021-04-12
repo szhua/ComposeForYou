@@ -14,12 +14,15 @@ import androidx.compose.material.icons.filled.EventNote
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.navigate
+import androidx.navigation.compose.popUpTo
 import com.orhanobut.logger.Logger
 import com.szhua.foryou.api.BMobService
 import com.szhua.foryou.common.Pages
@@ -27,6 +30,7 @@ import com.szhua.foryou.components.RefreshState
 import com.szhua.foryou.components.SwipeToRefreshLayout
 import com.szhua.foryou.data.BMobDiary
 import com.szhua.foryou.ui.theme.titleTextStyle
+import com.szhua.foryou.viewmodel.DiariesViewModel
 import kotlinx.coroutines.launch
 
 
@@ -65,32 +69,26 @@ fun DiariesScreen(nav :NavHostController){
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Diaries(nav: NavHostController) {
-    val refreshState by remember {
-        val refreshState = RefreshState()
-        refreshState.refreshDataState = true
-        mutableStateOf(refreshState)
-    }
-    val scope = rememberCoroutineScope()
-
-    val currentPage = remember {
-        mutableStateOf(0)
-    }
-    val diaries = remember {
-        mutableStateListOf<BMobDiary>()
-    }
 
 
-    var hadMoreData by remember {
-        mutableStateOf(true)
-    }
+
+
+
+    val diariesViewModel = viewModel<DiariesViewModel>()
+    val refreshState = RefreshState()
+    var  currentPage by diariesViewModel.currentPage.observeAsState() as MutableState
+    val  diaries     by  diariesViewModel.diaries.observeAsState()
+    var  hadMoreData by diariesViewModel.hasMoreData.observeAsState() as MutableState
+
     val scrollState = rememberLazyListState()
 
     suspend fun loadData() {
-        if (hadMoreData) {
-            val result = BMobService.create().findDiaries(10, currentPage.value * 10, "-createdAt")
-            diaries.addAll(result.results)
+        if (hadMoreData!!) {
+            val result = BMobService.create().findDiaries(10, currentPage!! * 10, "-createdAt")
             refreshState.stopLoadMore()
             refreshState.stopRefresh()
+            Logger.d("StopLoadMore")
+            diaries?.addAll(result.results)
             if (result.results.isEmpty()) {
                 hadMoreData = false
             }
@@ -99,15 +97,24 @@ fun Diaries(nav: NavHostController) {
         }
     }
 
+
+    val scope = rememberCoroutineScope()
+    val refreshFunction=fun (){
+        scope.launch {
+          loadData()
+      }
+    }
+   val refreshData by rememberUpdatedState(refreshFunction)
+
     SwipeToRefreshLayout(
         refreshingState = refreshState,
         onRefresh = {
-            diaries.clear()
-            currentPage.value = 0
+            diaries!!.clear()
+            currentPage = 0
             loadData()
         },
         onLoadMore = {
-            currentPage.value = currentPage.value + 1
+            currentPage = currentPage!! + 1
             loadData()
         },
         refreshIndicator = {
@@ -122,17 +129,27 @@ fun Diaries(nav: NavHostController) {
     ) {
 
         LazyColumn(state = scrollState) {
-            items(diaries.size, key = {
-                diaries[it].objectId
-            }, itemContent = { index ->
-                Detail(diary = diaries[index],hasMaxLines = true,click = {
+            items(diaries!!.size,
+                key = { diaries!![it].objectId },
+                itemContent = { index ->
+                Detail(diary = diaries!![index],hasMaxLines = true,click = {
                     val params =Bundle()
                     params.putSerializable("detail",it)
-                    nav.navigate(createRoute(Pages.DETAIL).hashCode(),params)
+                    nav.navigate(createRoute(Pages.DETAIL).hashCode(),params, navOptions {
+
+                    })
                 })
             })
         }
     }
+
+    LaunchedEffect(true){
+          if (diaries!!.isEmpty()){
+               refreshData()
+          }
+    }
+
+
 }
 
 

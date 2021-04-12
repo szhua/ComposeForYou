@@ -1,7 +1,5 @@
 package com.szhua.foryou.ui
 
-
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -32,6 +30,7 @@ fun DetailScreen(diary: BMobDiary,nav: NavHostController){
              navigationIcon = {
                  IconButton(onClick = {
                      nav.popBackStack()
+                     //nav.popBackStack()
                  }) {
                      Icon(Icons.Default.ArrowBackIos, "this is icon more", tint = Color.White)
                  }

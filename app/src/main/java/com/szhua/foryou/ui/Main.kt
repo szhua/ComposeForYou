@@ -46,7 +46,9 @@ fun Main(nav : NavHostController){
                     actions = {
                         IconButton(onClick = {
                             viewModel.refreshData.value = false
-                            nav.navigate(Pages.DIARIES_PAGE)
+                            nav.navigate(Pages.DIARIES_PAGE){
+                                launchSingleTop=true
+                            }
                         }) {
                             Icon(Icons.Default.EventNote,"this is icon more" ,tint = Color.White )
                         }

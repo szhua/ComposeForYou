@@ -34,7 +34,7 @@ Description:
 private val RefreshDistance = 80.dp
 
 
-private val LoadMoreDistance = 10.dp
+private val LoadMoreDistance = 40.dp
 
 
 
