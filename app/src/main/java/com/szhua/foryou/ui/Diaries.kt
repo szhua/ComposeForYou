@@ -70,14 +70,10 @@ fun DiariesScreen(nav :NavHostController){
 @Composable
 fun Diaries(nav: NavHostController) {
 
-
-
-
-
     val diariesViewModel = viewModel<DiariesViewModel>()
     val refreshState = RefreshState()
     var  currentPage by diariesViewModel.currentPage.observeAsState() as MutableState
-    val  diaries     by  diariesViewModel.diaries.observeAsState()
+    val  diaries     by diariesViewModel.diaries.observeAsState()
     var  hadMoreData by diariesViewModel.hasMoreData.observeAsState() as MutableState
 
     val scrollState = rememberLazyListState()
