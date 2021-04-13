@@ -68,17 +68,20 @@ click:(diary:BMobDiary)->Unit={}){
          ) {
         if (diary.content.isNotEmpty()){
             Column(
-                Modifier
-                    .padding(6.dp),horizontalAlignment = Alignment.CenterHorizontally) {
-                LoadImage(url = diary.diaryImg,  contentDescription = "Image detail" ,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(240.dp))
-                Spacer(modifier = Modifier.height(10.dp))
+                Modifier.padding(6.dp),horizontalAlignment = Alignment.CenterHorizontally) {
+                if (!diary.diaryImg.isNullOrEmpty()){
+                    LoadImage(url = diary.diaryImg,  contentDescription = "Image detail" ,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp))
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(text = diary.content ,
                     color = Color.DarkGray ,
                     maxLines = if (hasMaxLines) 5 else Int.MAX_VALUE,
                     overflow = TextOverflow.Ellipsis)
+                Spacer(modifier = Modifier.height(6.dp))
             }
         }
     }

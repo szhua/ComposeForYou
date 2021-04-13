@@ -26,6 +26,8 @@ import com.szhua.foryou.ui.theme.mainColor
 import com.szhua.foryou.ui.theme.mainColorLight
 import com.szhua.foryou.ui.theme.titleTextStyle
 import com.szhua.foryou.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
 @author  SZhua
@@ -82,7 +84,9 @@ fun Main(nav : NavHostController){
             LaunchedEffect(true){
                 //防止重复加载
                 if(refreshData==true) {
-                    val result = BMobService.create().findDiaries(1, 0, "-createdAt")
+                    val result = withContext(Dispatchers.IO){
+                        BMobService.create().findDiaries(1, 0, "-createdAt")
+                    }
                     if (result.results.isNotEmpty()) {
                         diary = result.results[0]
                     }

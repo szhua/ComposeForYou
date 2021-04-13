@@ -1,37 +1,32 @@
 package com.szhua.foryou.ui
 
 import android.os.Bundle
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
-import androidx.compose.material.icons.filled.Backup
-import androidx.compose.material.icons.filled.EventNote
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.*
-import androidx.navigation.compose.navigate
-import androidx.navigation.compose.popUpTo
+import androidx.navigation.NavHostController
+import androidx.navigation.navOptions
 import com.orhanobut.logger.Logger
 import com.szhua.foryou.api.BMobService
 import com.szhua.foryou.common.Pages
 import com.szhua.foryou.components.RefreshState
 import com.szhua.foryou.components.SwipeToRefreshLayout
-import com.szhua.foryou.data.BMobDiary
 import com.szhua.foryou.ui.theme.titleTextStyle
 import com.szhua.foryou.viewmodel.DiariesViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 /**
@@ -39,8 +34,6 @@ import kotlinx.coroutines.launch
 Create at  2021/4/7
 Description: 日记列表；
  */
-
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DiariesScreen(nav :NavHostController){
@@ -80,7 +73,9 @@ fun Diaries(nav: NavHostController) {
 
     suspend fun loadData() {
         if (hadMoreData!!) {
-            val result = BMobService.create().findDiaries(10, currentPage!! * 10, "-createdAt")
+            val result =  withContext(Dispatchers.IO){
+                BMobService.create().findDiaries(10, currentPage!! * 10, "-createdAt")
+            }
             refreshState.stopLoadMore()
             refreshState.stopRefresh()
             Logger.d("StopLoadMore")
@@ -132,7 +127,6 @@ fun Diaries(nav: NavHostController) {
                     val params =Bundle()
                     params.putSerializable("detail",it)
                     nav.navigate(createRoute(Pages.DETAIL).hashCode(),params, navOptions {
-
                     })
                 })
             })
