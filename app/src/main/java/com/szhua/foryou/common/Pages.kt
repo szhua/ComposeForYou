@@ -15,5 +15,6 @@ object Pages {
    const val  MAIN_PAGE ="main"
    const val  DIARIES_PAGE ="diaries"
    const val  DETAIL ="detail"
+   const val  SPLASH ="splash"
 
 }

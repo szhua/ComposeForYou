@@ -28,7 +28,6 @@ interface BMobService {
                    .addConverterFactory(GsonConverterFactory.create())
                    .build()
                    .create(BMobService::class.java)
-
         }
     }
 

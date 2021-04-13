@@ -56,6 +56,7 @@ fun Main(nav : NavHostController){
                 )
             }) {
             val scrollState = rememberScrollState()
+
             var  diary by rememberSaveable { mutableStateOf(BMobDiary())}
             Card(
                 backgroundColor= Color.White,
